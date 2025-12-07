@@ -1,4 +1,4 @@
-# Leaflet OSM Proxy Plugin
+# Leaflet OSM Proxy Next
 
 **A GDPR-compliant, filesystem-caching OpenStreetMap proxy for Next.js App Router.**
 
@@ -18,16 +18,7 @@ Using standard OpenStreetMap (OSM) tile servers (`tile.openstreetmap.org`) in yo
 
 ```bash
 # Using npm
-npm install leaflet-osm-proxy-plugin
-
-# Using yarn
-yarn add leaflet-osm-proxy-plugin
-
-# Using pnpm
-pnpm add leaflet-osm-proxy-plugin
-
-# Using bun
-bun add leaflet-osm-proxy-plugin
+npm install leaflet-osm-proxy-next
 ```
 
 1. Create the API Route (Server-Side)
