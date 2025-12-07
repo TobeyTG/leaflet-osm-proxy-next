@@ -1,5 +1,5 @@
 {
-  "name": "leaflet-osm-proxy-plugin",
+  "name": "leaflet-osm-proxy-next",
   "version": "1.0.0",
   "description": "GDPR-compliant OpenStreetMap tile proxy for Next.js App Router",
   "type": "module",
