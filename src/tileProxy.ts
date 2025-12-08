@@ -3,8 +3,30 @@ import { existsSync } from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
 
-export function createTileProxyHandler() {
-  return async function GET(_req: Request, { params }: { params: Promise<{ z: string; x: string; y: string }> }) {
+interface TileParams {
+  z: string;
+  x: string;
+  y: string;
+}
+
+interface ProxyOptions {
+  /**
+   * The User-Agent string to send to OSM.
+   * REQUIRED by OSM policy. Should include app name and contact info.
+   * @example "MyApp/1.0 (contact@example.com)"
+   */
+  userAgent: string;
+  /**
+   * Directory to store cached tiles. Defaults to "tile-cache" in process.cwd().
+   */
+  cacheFolder?: string;
+}
+
+export function createTileProxyHandler(options: ProxyOptions) {
+  const CACHE_ROOT = path.join(process.cwd(), options.cacheFolder || "tile-cache");
+  const UA = options.userAgent || "LeafletOSMProxy/1.0";
+
+  return async function GET(_req: Request, { params }: { params: Promise<TileParams> }) {
     const { z, x, y: yRaw } = await params;
     const y = yRaw.replace(/\.png$/i, "");
 
@@ -12,7 +34,7 @@ export function createTileProxyHandler() {
       return new NextResponse("Invalid path", { status: 400 });
     }
 
-    const cacheDir = path.join(process.cwd(), "tile-cache", z, x);
+    const cacheDir = path.join(CACHE_ROOT, z, x);
     const cacheFile = path.join(cacheDir, `${y}.png`);
 
     try {
@@ -32,7 +54,7 @@ export function createTileProxyHandler() {
 
       const upstreamUrl = `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
       const upstreamRes = await fetch(upstreamUrl, {
-        headers: { "User-Agent": "NextjsLocalProxy/1.0" },
+        headers: { "User-Agent": UA },
       });
 
       if (!upstreamRes.ok) {

@@ -27,8 +27,11 @@ npm install leaflet-osm-proxy-next
    **File:** app/api/tiles/[z]/[x]/[y]/route.ts
 
 ```typescript
-import { createTileProxyHandler } from "leaflet-osm-proxy-plugin";
-export const GET = createTileProxyHandler();
+import { createTileProxyHandler } from "leaflet-osm-proxy-next";
+export const GET = createTileProxyHandler({
+  userAgent: "LeafletOSMProxy/1.0", // Customize your User-Agent
+  cacheFolder: "tile-cache",        // Folder to store cached tiles
+});
 ```
 
 2. Configure the Map (Client-Side)
