@@ -16,15 +16,18 @@ export function createTileProxyHandler() {
     const cacheFile = path.join(cacheDir, `${y}.png`);
 
     try {
-      if (existsSync(cacheFile)) {
-        const data = await readFile(cacheFile);
-        return new NextResponse(data, {
-          status: 200,
-          headers: {
-            "Content-Type": "image/png",
-            "Cache-Control": "public, max-age=86400, immutable",
-          },
-        });
+      const data = await readFile(cacheFile);
+      return new NextResponse(data, {
+        status: 200,
+        headers: {
+          "Content-Type": "image/png",
+          "Cache-Control": "public, max-age=604800, immutable",
+        },
+      });
+    } catch (err: any) {
+      if (err.code !== "ENOENT") {
+        console.error("Cache read error:", err);
+      }
       }
 
       const upstreamUrl = `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
