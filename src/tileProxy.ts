@@ -1,5 +1,4 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
-import { existsSync } from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
 
@@ -50,8 +49,9 @@ export function createTileProxyHandler(options: ProxyOptions) {
       if (err.code !== "ENOENT") {
         console.error("Cache read error:", err);
       }
-      }
+    }
 
+    try {
       const upstreamUrl = `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
       const upstreamRes = await fetch(upstreamUrl, {
         headers: { "User-Agent": UA },
@@ -64,14 +64,20 @@ export function createTileProxyHandler(options: ProxyOptions) {
       const arrayBuffer = await upstreamRes.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
-      await mkdir(cacheDir, { recursive: true });
-      await writeFile(cacheFile, buffer);
+      (async () => {
+        try {
+          await mkdir(cacheDir, { recursive: true });
+          await writeFile(cacheFile, buffer);
+        } catch (writeErr) {
+          console.error("Failed to write tile to cache:", writeErr);
+        }
+      })();
 
       return new NextResponse(buffer, {
         status: 200,
         headers: {
           "Content-Type": "image/png",
-          "Cache-Control": "public, max-age=86400, immutable",
+          "Cache-Control": "public, max-age=604800, immutable",
         },
       });
     } catch (err) {
